@@ -14,6 +14,7 @@ use PhpSchool\CliMenu\MenuItem\SplitItem;
 use PhpSchool\CliMenu\MenuItem\StaticItem;
 use PhpSchool\CliMenu\Dialogue\Confirm;
 use PhpSchool\CliMenu\Dialogue\Flash;
+use PhpSchool\CliMenu\Dialogue\Choice;
 use PhpSchool\CliMenu\Terminal\TerminalFactory;
 use PhpSchool\CliMenu\Util\StringUtil as s;
 use PhpSchool\Terminal\InputCharacter;
@@ -39,6 +40,12 @@ class CliMenu
      * @var ?string
      */
     protected $title;
+
+    /**
+     * @var ?int
+     */
+    protected $requiredTerminalWidth = null;
+
 
     /**
      * @var MenuItemInterface[]
@@ -120,6 +127,23 @@ class CliMenu
         $this->terminal->enableCursor();
     }
 
+    /**
+     * @return mixed
+     */
+    public function getRequiredTerminalWidth(): ?int
+    {
+        return $this->requiredTerminalWidth;
+    }
+
+    /**
+     * @param mixed $requiredTerminalWidth
+     */
+    public function setRequiredTerminalWidth($requiredTerminalWidth): void
+    {
+        $this->requiredTerminalWidth = $requiredTerminalWidth;
+    }
+
+
     private function assertTerminalIsValidTTY() : void
     {
         if (!$this->terminal->isInteractive()) {
@@ -135,8 +159,8 @@ class CliMenu
     public function getTitle() : string
     {
         return $this->title;
-    }    
-    
+    }
+
     public function setParent(CliMenu $parent) : void
     {
         $this->parent = $parent;
@@ -331,7 +355,7 @@ class CliMenu
                     : reset($itemKeys);
             }
         } while (!$item->canSelectIndex($selectedItemIndex));
-        
+
         $item->setSelectedItemIndex($selectedItemIndex);
     }
 
@@ -459,7 +483,7 @@ class CliMenu
     protected function drawMenuItem(MenuItemInterface $item, bool $selected = false) : array
     {
         $rows = $item->getRows($this->style, $selected);
-        
+
         if ($item instanceof SplitItem) {
             $selected = false;
         }
@@ -504,9 +528,14 @@ class CliMenu
         if ($this->isOpen()) {
             return;
         }
-        
+
         if (count($this->items) === 0) {
             throw new \RuntimeException('Menu must have at least 1 item before it can be opened');
+        }
+        if($this->getRequiredTerminalWidth() !== null){
+            if($this->getRequiredTerminalWidth() > $this->terminal->getWidth()){
+                throw new \RuntimeException(sprintf("Terminal window must be %s columns wide, please increase the size of the window", $this->getRequiredTerminalWidth()));
+            }
         }
 
         $this->configureTerminal();
@@ -599,7 +628,22 @@ class CliMenu
 
         return new Confirm($this, $style, $this->terminal, $text);
     }
+	     /**
+      * @param string $text
+      * @return YesNo
+      */
+     public function choice($text, MenuStyle $style = null)
+     {
+         if (strpos($text, "\n") !== false) {
+             throw new \InvalidArgumentException;
+         }
 
+        $style = $style ?? (new MenuStyle($this->terminal))
+            ->setBg('yellow')
+            ->setFg('red');
+
+         return new Choice($this, $style, $this->terminal, $text);
+     }
     public function askNumber(MenuStyle $style = null) : Number
     {
         $this->assertOpen();

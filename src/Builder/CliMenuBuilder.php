@@ -42,6 +42,12 @@ class CliMenuBuilder
     private $style;
 
     /**
+     * @var ?int
+     */
+    protected $requiredTerminalWidth = null;
+
+
+    /**
      * @var Terminal
      */
     private $terminal;
@@ -67,12 +73,12 @@ class CliMenuBuilder
         $this->style    = new MenuStyle($this->terminal);
         $this->menu     = new CliMenu(null, [], $this->terminal, $this->style);
     }
-    
+
     public static function newSubMenu(Terminal $terminal) : self
     {
         $instance = new self($terminal);
         $instance->subMenu = true;
-        
+
         return $instance;
     }
 
@@ -109,6 +115,31 @@ class CliMenuBuilder
 
         return $this;
     }
+    /**
+     * @return mixed
+     */
+    public function getRequiredTerminalWidth(): ?int
+    {
+        return $this->requiredTerminalWidth;
+    }
+
+    /**
+     * @param mixed $requiredTerminalWidth
+     */
+    public function setRequiredTerminalWidth(int $requiredTerminalWidth): self
+    {
+        $this->requiredTerminalWidth = $requiredTerminalWidth;
+
+        return $this;
+    }
+
+
+    private function assertTerminalIsValidTTY() : void
+    {
+        if (!$this->terminal->isInteractive()) {
+            throw new InvalidTerminalException('Terminal is not interactive (TTY)');
+        }
+    }
 
     public function addStaticItem(string $text) : self
     {
@@ -140,7 +171,7 @@ class CliMenuBuilder
 
         $menu = $builder->build();
         $menu->setParent($this->menu);
-        
+
         //we apply the parent theme if nothing was changed
         //if no styles were changed in this sub-menu
         if (!$menu->getStyle()->hasChangedFromDefaults()) {
@@ -152,7 +183,7 @@ class CliMenuBuilder
             $menu,
             $builder->isMenuDisabled()
         ));
-        
+
         return $this;
     }
 
@@ -182,9 +213,9 @@ class CliMenuBuilder
 
         $callback = $callback->bindTo($builder);
         $callback($builder);
-        
+
         $this->menu->addItem($builder->build());
-        
+
         return $this;
     }
 
@@ -319,7 +350,7 @@ class CliMenuBuilder
     public function setBorderTopWidth(int $width) : self
     {
         $this->style->setBorderTopWidth($width);
-        
+
         return $this;
     }
 
@@ -385,12 +416,13 @@ class CliMenuBuilder
             return $item->showsItemExtra();
         }));
     }
-    
+
     public function build() : CliMenu
     {
         if (!$this->disableDefaultItems) {
             $this->menu->addItems($this->getDefaultItems());
         }
+        $this->menu->setRequiredTerminalWidth($this->getRequiredTerminalWidth());
 
         $this->style->setDisplaysExtra($this->itemsHaveExtra($this->menu->getItems()));
 
