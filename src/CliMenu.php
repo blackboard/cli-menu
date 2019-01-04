@@ -639,11 +639,31 @@ class CliMenu
          }
 
         $style = $style ?? (new MenuStyle($this->terminal))
-            ->setBg('yellow')
-            ->setFg('red');
+            ->setBg('240')
+            ->setFg('154');
 
          return new Choice($this, $style, $this->terminal, $text);
      }
+    public function yesNoConfirm(string $question, \Closure $callback, MenuStyle $style = null) : void
+    {
+        $style = $style ?? (new MenuStyle($this->terminal))
+            ->setBg('240')
+            ->setFg('154');
+
+         $this->choice(sprintf($question),$style)
+             ->setLeftButton('No', false)
+             ->setRightButton('Yes', true)
+             ->setOptionValue(false)
+             ->display(function ($res) use ($callback) {
+                 if($res){
+                     $callback();
+                 }
+             });
+    }
+
+
+
+
     public function askNumber(MenuStyle $style = null) : Number
     {
         $this->assertOpen();
