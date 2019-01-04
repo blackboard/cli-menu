@@ -632,8 +632,8 @@ class CliMenu
       * @param string $text
       * @return YesNo
       */
-     public function choice($text, MenuStyle $style = null)
-     {
+    public function choice($text, MenuStyle $style = null) : Choice
+    {
          if (strpos($text, "\n") !== false) {
              throw new \InvalidArgumentException;
          }
@@ -643,7 +643,7 @@ class CliMenu
             ->setFg('154');
 
          return new Choice($this, $style, $this->terminal, $text);
-     }
+    }
     public function yesNoConfirm(string $question, \Closure $callback, MenuStyle $style = null) : void
     {
         $style = $style ?? (new MenuStyle($this->terminal))
@@ -660,9 +660,6 @@ class CliMenu
                  }
              });
     }
-
-
-
 
     public function askNumber(MenuStyle $style = null) : Number
     {
