@@ -35,6 +35,14 @@ class SelectableItem implements MenuItemInterface
     }
 
     /**
+     * Execute the items callable if required
+     */
+    public function setSelectAction(callable $action) : void
+    {
+        $this->selectAction = $action;
+    }    
+    
+    /**
      * Return the raw string of text
      */
     public function getText() : string
