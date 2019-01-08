@@ -34,9 +34,10 @@ class SplitItemBuilder
         string $text,
         callable $itemCallable,
         bool $showItemExtra = false,
-        bool $disabled = false
+        bool $disabled = false,
+        ?string $itemId = null
     ) : self {
-        $this->splitItem->addItem(new SelectableItem($text, $itemCallable, $showItemExtra, $disabled));
+        $this->splitItem->addItem(new SelectableItem($text, $itemCallable, $showItemExtra, $disabled,$itemId));
 
         return $this;
     }
