@@ -18,12 +18,14 @@ class SelectableItem implements MenuItemInterface
         string $text,
         callable $selectAction,
         bool $showItemExtra = false,
-        bool $disabled = false
+        bool $disabled = false,
+        string $itemId = null;
     ) {
         $this->text          = $text;
         $this->selectAction  = $selectAction;
         $this->showItemExtra = $showItemExtra;
         $this->disabled      = $disabled;
+        $this->itemId        = $itemId;
     }
 
     /**
