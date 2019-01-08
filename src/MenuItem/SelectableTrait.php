@@ -16,6 +16,11 @@ trait SelectableTrait
     private $text = '';
 
     /**
+     * @var string|null
+     */
+    private $itemId;    
+    
+    /**
      * @var bool
      */
     private $showItemExtra = false;
@@ -86,4 +91,20 @@ trait SelectableTrait
     {
         $this->showItemExtra = false;
     }
+    
+    /**
+     * Get the item Id
+     */
+    public function getItemId() : ?string
+    {
+        return $this->itemId;
+    }    
+    
+    /**
+     * Get the item Id
+     */
+    public function setItemId(?string $itemId) : void 
+    {
+        $this->itemId = $itemId;
+    }        
 }
