@@ -59,6 +59,14 @@ class MenuMenuItem implements MenuItemInterface
     }
 
     /**
+     * Returns the sub menu
+     */
+    public function setSubMenu(CliMenu $subMenu) : void 
+    {
+        $this->subMenu = $subMenu;
+    }    
+    
+    /**
      * Display the sub menu
      */
     public function showSubMenu(CliMenu $parentMenu) : void
