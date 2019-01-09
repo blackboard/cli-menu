@@ -107,4 +107,13 @@ trait SelectableTrait
     {
         $this->itemId = $itemId;
     }        
+    
+    /**
+     * Get the item Id
+     */
+    public function setDisabled(bool $disabled) : void 
+    {
+        $this->disabled = $disabled;
+    }            
+    
 }
