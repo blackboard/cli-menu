@@ -105,7 +105,7 @@ class Password implements Input
             return $validator($input);
         }
 
-        return mb_strlen($input) >= 16;
+        return true;
     }
 
     public function filter(string $value) : string
