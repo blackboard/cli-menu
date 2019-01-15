@@ -2,6 +2,8 @@
 
 namespace PhpSchool\CliMenu;
 
+use PhpSchool\CliMenu\Action\ExitAction;
+use PhpSchool\CliMenu\Action\GoBackAction;
 use PhpSchool\CliMenu\Exception\InvalidTerminalException;
 use PhpSchool\CliMenu\Exception\MenuNotOpenException;
 use PhpSchool\CliMenu\Input\InputIO;
@@ -10,6 +12,7 @@ use PhpSchool\CliMenu\Input\Password;
 use PhpSchool\CliMenu\Input\Text;
 use PhpSchool\CliMenu\MenuItem\LineBreakItem;
 use PhpSchool\CliMenu\MenuItem\MenuItemInterface;
+use PhpSchool\CliMenu\MenuItem\MenuMenuItem;
 use PhpSchool\CliMenu\MenuItem\SplitItem;
 use PhpSchool\CliMenu\MenuItem\StaticItem;
 use PhpSchool\CliMenu\Dialogue\Confirm;
@@ -191,6 +194,41 @@ class CliMenu
         $this->selectFirstItem();
     }
 
+    /**
+     * Add a new Item to the menu
+     */
+    public function fixOrder() : void
+    {
+        $items          = array_reverse($this->items);
+        $metaItems      = [];
+        $selectItems    = [];
+        $reorderedItems = [];
+        foreach($items as $item){
+
+            if($item->getSelectAction() instanceof GoBackAction || 
+                $item->getSelectAction() instanceof ExitAction || 
+                $item instanceof LineBreakItem ) {
+                $metaItems[] = $item;
+            }else{
+                $selectItems[] = $item;
+            }
+        }
+
+        $selectItems = array_reverse($selectItems);
+        foreach($selectItems as $item){
+            $reorderedItems[] = $item;
+        }
+
+        $metaItems = array_reverse($metaItems);
+        foreach($metaItems as $item){
+            $reorderedItems[] = $item;
+        }
+
+        $this->items = $reorderedItems;
+
+        $this->selectFirstItem();
+    }	
+	
     /**
      * Add multiple Items to the menu
      */
